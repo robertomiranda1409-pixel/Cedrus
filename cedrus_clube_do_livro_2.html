@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cedrus — Clube do Livro</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --purple:     #534AB7;
+  --purple-dk:  #3C3489;
+  --purple-lt:  #EEEDFE;
+  --purple-mid: #AFA9EC;
+  --green-lt:   #EAF3DE;
+  --green-dk:   #27500A;
+  --green-mid:  #3B6D11;
+  --amber-lt:   #FAEEDA;
+  --amber-dk:   #633806;
+  --amber-mid:  #BA7517;
+  --blue-lt:    #E6F1FB;
+  --blue-dk:    #0C447C;
+  --gray-lt:    #F1EFE8;
+  --gray-dk:    #444441;
+  --red-lt:     #FCEBEB;
+  --red-dk:     #A32D2D;
+  --bg:         #f7f6f2;
+  --surface:    #ffffff;
+  --surface2:   #f1efe8;
+  --border:     #e2dfd6;
+  --border2:    #ccc8bc;
+  --text:       #1a1917;
+  --text2:      #6b6860;
+  --text3:      #999;
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+}
+
+body {
+  font-family: 'Georgia', serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+/* ── APP SHELL ── */
+.app { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+/* ── HEADER ── */
+.header {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.logo {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: var(--purple-dk); display: flex; align-items: center;
+  justify-content: center; font-size: 22px; flex-shrink: 0;
+}
+.header-text h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+.header-text p  { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.sync-status {
+  margin-left: auto; font-size: 11px; color: var(--text2);
+  display: flex; align-items: center; gap: 5px; flex-shrink: 0;
+}
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-mid); }
+.sync-dot.saving { background: var(--amber-mid); animation: pulse 1s infinite; }
+.sync-dot.error  { background: #E24B4A; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+/* ── TABS ── */
+.tabs {
+  display: flex; gap: 4px;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+}
+.tab {
+  flex: 1; padding: 7px 10px; font-size: 12px; font-weight: 500;
+  cursor: pointer; border: none; border-radius: 7px;
+  color: var(--text2); background: none; white-space: nowrap;
+  transition: all 0.15s; min-width: fit-content;
+}
+.tab.active { background: var(--purple); color: white; }
+.tab:hover:not(.active) { background: var(--surface2); color: var(--text); }
+
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+.card-title { font-size: 13px; font-weight: 600; color: var(--text); }
+
+/* ── BADGES ── */
+.badge {
+  font-size: 10px; padding: 3px 9px; border-radius: 20px;
+  font-weight: 600; letter-spacing: 0.2px;
+}
+.bp  { background: var(--purple-lt); color: var(--purple-dk); }
+.bg  { background: var(--green-lt);  color: var(--green-dk); }
+.ba  { background: var(--amber-lt);  color: var(--amber-dk); }
+.bk  { background: var(--gray-lt);   color: var(--gray-dk); }
+.bb  { background: var(--blue-lt);   color: var(--blue-dk); }
+
+/* ── BANNER ── */
+.banner {
+  background: var(--purple);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.25rem; margin-bottom: 1rem; color: white;
+}
+.banner h2 { font-size: 11px; font-weight: 400; opacity: 0.8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.banner h3 { font-size: 18px; font-weight: 600; margin-bottom: 5px; }
+.banner p  { font-size: 12px; opacity: 0.75; }
+.countdown {
+  display: inline-block; background: rgba(255,255,255,0.18);
+  padding: 3px 12px; border-radius: 20px; font-size: 12px;
+  margin-top: 7px; font-weight: 500;
+}
+
+/* ── STATS ── */
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1rem; }
+.stat-card {
+  background: var(--surface2); border-radius: var(--radius-md);
+  padding: 0.85rem; text-align: center;
+}
+.stat-num   { font-size: 24px; font-weight: 600; color: var(--purple); }
+.stat-label { font-size: 10px; color: var(--text2); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
+
+/* ── MEETING ITEMS ── */
+.meeting-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 0; border-bottom: 0.5px solid var(--border);
+}
+.meeting-item:last-child { border-bottom: none; padding-bottom: 0; }
+.date-box {
+  min-width: 44px; text-align: center;
+  background: var(--purple-lt); border-radius: var(--radius-md);
+  padding: 6px 4px; flex-shrink: 0;
+}
+.date-day   { font-size: 20px; font-weight: 700; color: var(--purple-dk); line-height: 1; }
+.date-month { font-size: 9px; color: var(--purple); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
+.meeting-info { flex: 1; min-width: 0; }
+.meeting-title-row { font-size: 13px; font-weight: 600; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.meeting-meta { font-size: 11px; color: var(--text2); }
+.meeting-chaps {
+  font-size: 11px; color: var(--purple); background: var(--purple-lt);
+  padding: 2px 9px; border-radius: 4px; display: inline-block; margin-top: 5px;
+  font-weight: 500;
+}
+.meeting-detail { font-size: 11px; color: var(--text2); margin-top: 5px; line-height: 1.65; }
+
+.icon-btn {
+  background: none; border: none; cursor: pointer; font-size: 14px;
+  color: var(--text3); padding: 4px 6px; border-radius: 6px; transition: all 0.15s;
+}
+.icon-btn:hover { background: var(--surface2); color: var(--text); }
+.icon-btn.danger:hover { background: var(--red-lt); color: var(--red-dk); }
+
+/* ── INLINE EDIT ── */
+.inline-edit {
+  display: none; background: var(--surface2);
+  border-radius: var(--radius-md); padding: 10px; margin-top: 8px;
+  border: 0.5px solid var(--border);
+}
+.inline-edit.open { display: block; }
+.ie-row { display: flex; gap: 8px; margin-bottom: 6px; align-items: center; }
+.ie-row label { font-size: 11px; color: var(--text2); min-width: 70px; }
+.ie-row input, .ie-row select {
+  flex: 1; font-size: 12px; padding: 5px 8px;
+  border: 0.5px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text);
+}
+
+/* ── PARTICIPANTS ── */
+.participant-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; background: var(--surface2);
+  border-radius: var(--radius-md); margin-bottom: 6px;
+}
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--purple-lt); display: flex; align-items: center;
+  justify-content: center; font-size: 12px; font-weight: 700;
+  color: var(--purple-dk); flex-shrink: 0;
+}
+.p-name { font-size: 13px; font-weight: 600; flex: 1; }
+.p-role { font-size: 11px; color: var(--text2); }
+.read-toggle {
+  width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; cursor: pointer; font-weight: 700; transition: all 0.15s;
+}
+.read-yes { background: var(--green-lt); border-color: var(--green-mid); color: var(--green-dk); }
+.read-no  { background: var(--surface2); border-color: var(--border2);   color: var(--text3); }
+
+/* ── BOOK ── */
+.book-cover {
+  display: flex; gap: 1rem; padding: 1rem;
+  background: var(--surface2); border-radius: var(--radius-md); margin-bottom: 1rem;
+}
+.book-spine {
+  width: 58px; min-height: 84px; background: var(--purple);
+  border-radius: 4px 10px 10px 4px; display: flex; align-items: center;
+  justify-content: center; padding: 8px 4px; flex-shrink: 0; position: relative;
+}
+.book-spine::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+  background: var(--purple-dk); border-radius: 4px 0 0 4px;
+}
+.book-spine-text {
+  writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);
+  font-size: 8px; color: var(--purple-lt); letter-spacing: 1.2px; font-weight: 700;
+}
+.book-info { flex: 1; }
+.book-title-disp  { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+.book-author-disp { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
+.pbar-wrap { height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 5px; overflow: hidden; }
+.pbar-fill { height: 100%; background: var(--purple); border-radius: 3px; transition: width 0.5s ease; }
+.pbar-label { font-size: 11px; color: var(--text2); }
+
+/* ── CHAPTERS ── */
+.chapter-group { margin-bottom: 14px; }
+.chapter-group-header {
+  font-size: 11px; font-weight: 700; color: var(--purple);
+  background: var(--purple-lt); padding: 5px 12px; border-radius: 7px;
+  margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.chapter-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border-radius: var(--radius-md); border: 0.5px solid var(--border);
+  background: var(--surface); margin-bottom: 4px; transition: background 0.15s;
+}
+.chapter-item:hover { background: var(--surface2); }
+.chapter-item.done-item { background: var(--surface2); }
+.ch-num {
+  width: 26px; height: 26px; border-radius: 50%; background: var(--purple-lt);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--purple-dk); flex-shrink: 0; cursor: pointer;
+}
+.ch-num.done-num { background: var(--green-lt); color: var(--green-dk); }
+.ch-name { font-size: 13px; flex: 1; cursor: pointer; }
+.ch-name.done-text { color: var(--text2); text-decoration: line-through; }
+.ch-name:hover { color: var(--purple); }
+.ch-edit-in {
+  font-size: 12px; padding: 3px 8px; border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--surface); color: var(--text);
+  flex: 1; display: none;
+}
+.ch-meeting-sel {
+  font-size: 11px; padding: 2px 6px; border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--surface); color: var(--text2);
+  max-width: 130px; display: none;
+}
+.ch-pg { font-size: 10px; color: var(--text3); min-width: 36px; text-align: right; font-style: italic; }
+
+/* ── REMINDER ── */
+.msg-box {
+  font-size: 13px; color: var(--text);
+  background: var(--surface2); border-radius: var(--radius-md);
+  padding: 1rem 1.1rem; line-height: 1.8;
+  border-left: 3px solid var(--purple); margin-top: 8px;
+  white-space: pre-wrap; font-family: 'Georgia', serif;
+}
+.msg-edit {
+  width: 100%; font-size: 13px; padding: 10px 12px;
+  border: 0.5px solid var(--border); border-radius: var(--radius-md);
+  background: var(--surface); color: var(--text);
+  resize: vertical; line-height: 1.75; min-height: 240px;
+  font-family: 'Georgia', serif;
+}
+.msg-tab { display: flex; gap: 0; margin-bottom: 10px; border-bottom: 0.5px solid var(--border); }
+.msg-tab-btn {
+  padding: 7px 14px; font-size: 12px; cursor: pointer; border: none;
+  border-bottom: 2px solid transparent; color: var(--text2); background: none;
+  margin-bottom: -0.5px; transition: all 0.15s; font-weight: 500;
+}
+.msg-tab-btn.active { color: var(--purple); border-bottom-color: var(--purple); }
+
+/* ── ALERTS ── */
+.alert-banner {
+  display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+  border-radius: var(--radius-md); background: var(--amber-lt);
+  border: 0.5px solid var(--amber-mid); margin-bottom: 1rem;
+}
+.alert-banner-text { font-size: 13px; color: var(--amber-dk); flex: 1; font-weight: 500; }
+.alert-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  border-radius: var(--radius-md); border: 0.5px solid var(--border);
+  background: var(--surface); margin-bottom: 8px;
+}
+.alert-icon {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.alert-icon.active  { background: var(--amber-lt); }
+.alert-icon.sent    { background: var(--green-lt); }
+.alert-icon.pending { background: var(--purple-lt); }
+.alert-info { flex: 1; }
+.alert-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.alert-meta  { font-size: 11px; color: var(--text2); }
+
+/* ── LIBRARY ── */
+.book-lib-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+  border-radius: var(--radius-md); border: 0.5px solid var(--border);
+  background: var(--surface); margin-bottom: 6px; cursor: pointer; transition: all 0.15s;
+}
+.book-lib-item:hover { border-color: var(--purple); }
+.book-lib-item.active-book { border-color: var(--purple); background: var(--purple-lt); }
+.book-mini-spine { width: 9px; height: 44px; border-radius: 2px 4px 4px 2px; flex-shrink: 0; }
+.book-lib-info { flex: 1; }
+.book-lib-title  { font-size: 13px; font-weight: 600; }
+.book-lib-author { font-size: 11px; color: var(--text2); margin-top: 1px; }
+
+/* ── FORMS ── */
+.input-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+.input-row label { font-size: 12px; color: var(--text2); min-width: 85px; font-weight: 500; }
+.input-row input, .input-row select, .input-row textarea {
+  flex: 1; font-size: 13px; padding: 7px 10px;
+  border: 0.5px solid var(--border); border-radius: var(--radius-md);
+  background: var(--surface); color: var(--text); font-family: inherit;
+  transition: border-color 0.15s;
+}
+.input-row input:focus, .input-row select:focus, .input-row textarea:focus {
+  outline: none; border-color: var(--purple);
+}
+textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+
+/* ── BUTTONS ── */
+.btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.btn {
+  padding: 7px 16px; font-size: 12px; font-weight: 600; border-radius: var(--radius-md);
+  cursor: pointer; border: 0.5px solid var(--border);
+  background: var(--surface); color: var(--text); transition: all 0.15s;
+  font-family: inherit;
+}
+.btn:hover { background: var(--surface2); border-color: var(--border2); }
+.btn-p { background: var(--purple); color: white; border-color: var(--purple); }
+.btn-p:hover { background: var(--purple-dk); border-color: var(--purple-dk); }
+.btn-sm { padding: 4px 11px; font-size: 11px; }
+
+/* ── DIVIDER ── */
+.divider { height: 0.5px; background: var(--border); margin: 14px 0; }
+
+/* ── EMPTY STATE ── */
+.section-empty {
+  text-align: center; padding: 2rem 1rem;
+  color: var(--text2); font-size: 13px;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 1.25rem; right: 1.25rem;
+  background: var(--purple-dk); color: white;
+  padding: 10px 18px; border-radius: var(--radius-md);
+  font-size: 13px; display: none; z-index: 9999;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  animation: slideup 0.2s ease;
+}
+@keyframes slideup { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── LOADING ── */
+.loading-overlay {
+  position: fixed; inset: 0; background: rgba(247,246,242,0.92);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10000; font-size: 14px; color: var(--purple); font-weight: 500;
+}
+.spinner {
+  width: 22px; height: 22px; border: 2.5px solid var(--purple-lt);
+  border-top-color: var(--purple); border-radius: 50%;
+  animation: spin 0.7s linear infinite; margin-right: 10px;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 500px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .stat-num { font-size: 20px; }
+  .header-text h1 { font-size: 16px; }
+  .tab { padding: 7px 8px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div> Carregando Cedrus...
+</div>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">🌲</div>
+    <div class="header-text">
+      <h1>Cedrus — Clube do Livro</h1>
+      <p>Ministério de Homens · Grupo de Liderança · Abr–Out 2026</p>
+    </div>
+    <div class="sync-status">
+      <div class="sync-dot" id="sync-dot"></div>
+      <span id="sync-label">Sincronizado</span>
+      <button onclick="forceResync()" title="Forçar regravação no Sheets"
+        style="background:none;border:0.5px solid var(--border);border-radius:5px;padding:2px 7px;font-size:10px;cursor:pointer;color:var(--text2);margin-left:4px">↺</button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('agenda',this)">Agenda</button>
+    <button class="tab" onclick="switchTab('participantes',this)">Participantes</button>
+    <button class="tab" onclick="switchTab('livro',this)">Livro</button>
+    <button class="tab" onclick="switchTab('lembretes',this)">Lembretes</button>
+    <button class="tab" onclick="switchTab('biblioteca',this)">Biblioteca</button>
+  </div>
+
+  <!-- ═══ AGENDA ═══ -->
+  <div class="section active" id="tab-agenda">
+    <div class="banner">
+      <h2>Próximo encontro</h2>
+      <h3 id="next-title">—</h3>
+      <p id="next-meta">—</p>
+      <span class="countdown" id="countdown">—</span>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">Agendados</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-done">0</div><div class="stat-label">Realizados</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-members">0</div><div class="stat-label">Participantes</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Cronograma completo</span>
+        <span class="badge bk">12 encontros · Abr–Out 2026</span>
+      </div>
+      <div id="meeting-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Novo encontro</span></div>
+      <div class="input-row"><label>Data</label><input type="date" id="nm-date"></div>
+      <div class="input-row"><label>Capítulos</label><input type="text" id="nm-chaps" placeholder="ex: Cap. 3"></div>
+      <div class="input-row"><label>Link Zoom</label><input type="text" id="nm-link" placeholder="https://zoom.us/..."></div>
+      <div class="input-row"><label>Notas</label><input type="text" id="nm-notes" placeholder="Tema ou observações"></div>
+      <div class="btn-row"><button class="btn btn-p" onclick="addMeeting()">+ Adicionar encontro</button></div>
+    </div>
+  </div>
+
+  <!-- ═══ PARTICIPANTES ═══ -->
+  <div class="section" id="tab-participantes">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Líderes do grupo</span>
+        <span class="badge bp" id="p-count">0 membros</span>
+      </div>
+      <div id="participant-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Adicionar participante</span></div>
+      <div class="input-row"><label>Nome</label><input type="text" id="np-name" placeholder="Nome completo"></div>
+      <div class="input-row"><label>Papel</label>
+        <select id="np-role">
+          <option>Presbítero</option><option>Líder de célula</option>
+          <option>Diácono</option><option>Coordenador</option><option>Outro</option>
+        </select>
+      </div>
+      <div class="input-row"><label>WhatsApp</label><input type="text" id="np-phone" placeholder="+55 11 99999-9999"></div>
+      <div class="btn-row"><button class="btn btn-p" onclick="addParticipant()">+ Adicionar</button></div>
+    </div>
+  </div>
+
+  <!-- ═══ LIVRO ═══ -->
+  <div class="section" id="tab-livro">
+    <div class="book-cover">
+      <div class="book-spine" id="book-spine-el">
+        <span class="book-spine-text" id="spine-text">HOMEM AO MÁXIMO</span>
+      </div>
+      <div class="book-info">
+        <div class="book-title-disp" id="book-title-disp">Homem ao Máximo</div>
+        <div class="book-author-disp" id="book-author-disp">Edwin Louis Cole</div>
+        <div class="pbar-wrap"><div class="pbar-fill" id="book-pbar" style="width:0%"></div></div>
+        <div class="pbar-label" id="book-prog-label">0 de 20 capítulos lidos (0%)</div>
+        <span class="badge bp" style="margin-top:10px;display:inline-block">Em andamento</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Capítulos por encontro</span>
+        <span class="badge bb">Toque no título para editar</span>
+      </div>
+      <div id="chapter-list"></div>
+      <div class="divider"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="new-ch-name" placeholder="Nome do novo capítulo"
+          style="flex:1;font-size:13px;padding:7px 10px;border:0.5px solid var(--border);border-radius:var(--radius-md);background:var(--surface);color:var(--text)">
+        <button class="btn btn-p btn-sm" onclick="addChapter()">+ Capítulo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LEMBRETES ═══ -->
+  <div class="section" id="tab-lembretes">
+    <div id="alert-due-banner" style="display:none">
+      <div class="alert-banner">
+        <span style="font-size:22px">🔔</span>
+        <div class="alert-banner-text" id="alert-banner-text">Lembrete pendente de envio!</div>
+        <button class="btn btn-p btn-sm" onclick="sendDueAlert()">Enviar agora</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Mensagem de lembrete</span>
+        <span class="badge bg" id="reminder-badge">Pronto para enviar</span>
+      </div>
+      <div class="msg-tab">
+        <button class="msg-tab-btn active" onclick="switchMsgTab('preview',this)">Visualizar</button>
+        <button class="msg-tab-btn" onclick="switchMsgTab('edit',this)">Editar mensagem</button>
+      </div>
+      <div class="input-row" style="margin-bottom:4px">
+        <label>Encontro</label>
+        <select id="reminder-meeting-sel" onchange="updateReminderPreview()"></select>
+      </div>
+      <div id="msg-preview-panel">
+        <div class="msg-box" id="reminder-msg"></div>
+        <div class="btn-row">
+          <button class="btn" onclick="copyReminder()">Copiar</button>
+          <button class="btn btn-p" onclick="openWhatsApp()">WhatsApp ↗</button>
+        </div>
+      </div>
+      <div id="msg-edit-panel" style="display:none">
+        <textarea class="msg-edit" id="msg-custom-text"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-p" onclick="saveCustomMsg()">Salvar mensagem</button>
+          <button class="btn" onclick="resetCustomMsg()">Restaurar padrão</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">Agendar alerta automático</span></div>
+      <div class="input-row"><label>Encontro</label><select id="alert-meeting-sel"></select></div>
+      <div class="input-row"><label>Alertar em</label>
+        <select id="alert-days">
+          <option value="1">1 dia antes</option><option value="2">2 dias antes</option>
+          <option value="3" selected>3 dias antes</option>
+          <option value="5">5 dias antes</option><option value="7">7 dias antes</option>
+        </select>
+      </div>
+      <div class="input-row"><label>Incluir link</label>
+        <select id="alert-link"><option value="sim">Sim</option><option value="nao">Não</option></select>
+      </div>
+      <div class="btn-row"><button class="btn btn-p" onclick="scheduleAlert()">📅 Agendar alerta</button></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Alertas agendados</span>
+        <span class="badge bp" id="alerts-count">0</span>
+      </div>
+      <div id="alerts-list"><div class="section-empty">Nenhum alerta agendado.</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">Registrar ata</span></div>
+      <div class="input-row"><label>Encontro</label><select id="ata-sel"></select></div>
+      <div class="input-row" style="align-items:flex-start">
+        <label style="padding-top:5px">Notas</label>
+        <textarea id="ata-notes" placeholder="Pontos discutidos, decisões, próximos passos..."></textarea>
+      </div>
+      <div class="btn-row"><button class="btn btn-p" onclick="saveAta()">Salvar ata</button></div>
+    </div>
+    <div id="atas-display"></div>
+  </div>
+
+  <!-- ═══ BIBLIOTECA ═══ -->
+  <div class="section" id="tab-biblioteca">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Livros da biblioteca</span>
+        <span class="badge bp" id="lib-count">0 livros</span>
+      </div>
+      <div id="book-lib-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Adicionar livro</span></div>
+      <div class="input-row"><label>Título</label><input type="text" id="nb-title" placeholder="Título do livro"></div>
+      <div class="input-row"><label>Autor</label><input type="text" id="nb-author" placeholder="Autor"></div>
+      <div class="input-row"><label>Total cap.</label><input type="number" id="nb-chapters" min="1" max="60" value="12"></div>
+      <div class="input-row"><label>Cor da capa</label>
+        <select id="nb-color">
+          <option value="#534AB7">Roxo</option><option value="#3B6D11">Verde</option>
+          <option value="#BA7517">Âmbar</option><option value="#A32D2D">Vermelho</option>
+          <option value="#185FA5">Azul</option><option value="#444441">Cinza</option>
+        </select>
+      </div>
+      <div class="btn-row"><button class="btn btn-p" onclick="addBook()">+ Adicionar livro</button></div>
+    </div>
+  </div>
+
+</div><!-- /.app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MONTHS   = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const MONTHS_L = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const ORDINALS = ['1º','2º','3º','4º','5º','6º','7º','8º','9º','10º','11º','12º'];
+
+const MSG_M1 = `🌲 *CEDRUS — Clube do Livro*
+
+Valentes, nosso primeiro encontro está chegando!
+
+📅 *Terça-feira, 21 de Abril*
+🕗 *20h às 21h*
+
+📖 *Leitura para esta semana:*
+• Cap. 1: Uma sentença forte (p.16)
+• Cap. 2: Impedidos de entrar em Canaã (p.20)
+
+Venham com o livro lido e prontos para o mastermind. A leitura é o combustível da conversa — sem ela, não tem discussão.
+
+_"Ferro com ferro se afia; assim o homem afia o rosto do seu amigo."_ — Pv 27:17
+
+Nos vemos na terça! 💪
+
+_Cedrus — Forjando homens para Deus_`;
+
+const DEFAULT = {
+  activeBookId: 'b1',
+  books: [{ id:'b1', title:'Homem ao Máximo', author:'Edwin Louis Cole', totalChapters:20, chaptersRead:0, color:'#534AB7' }],
+  meetings: [
+    { id:'m1',  date:'2026-04-21', chapters:'Cap. 1–2',   done:false, link:'', notes:'', customMsg: MSG_M1 },
+    { id:'m2',  date:'2026-05-05', chapters:'Cap. 3',     done:false, link:'', notes:'', customMsg:'' },
+    { id:'m3',  date:'2026-05-19', chapters:'Cap. 4',     done:false, link:'', notes:'', customMsg:'' },
+    { id:'m4',  date:'2026-06-02', chapters:'Cap. 5–6',   done:false, link:'', notes:'', customMsg:'' },
+    { id:'m5',  date:'2026-06-16', chapters:'Cap. 7–8',   done:false, link:'', notes:'', customMsg:'' },
+    { id:'m6',  date:'2026-07-07', chapters:'Cap. 9',     done:false, link:'', notes:'', customMsg:'' },
+    { id:'m7',  date:'2026-07-21', chapters:'Cap. 10',    done:false, link:'', notes:'', customMsg:'' },
+    { id:'m8',  date:'2026-08-04', chapters:'Cap. 11',    done:false, link:'', notes:'', customMsg:'' },
+    { id:'m9',  date:'2026-08-18', chapters:'Cap. 12–13', done:false, link:'', notes:'', customMsg:'' },
+    { id:'m10', date:'2026-09-01', chapters:'Cap. 14–15', done:false, link:'', notes:'', customMsg:'' },
+    { id:'m11', date:'2026-09-15', chapters:'Cap. 16–17', done:false, link:'', notes:'', customMsg:'' },
+    { id:'m12', date:'2026-10-06', chapters:'Cap. 18–20', done:false, link:'', notes:'', customMsg:'' },
+  ],
+  chapters: [
+    { id:'c1',  num:1,  name:'Uma sentença forte',                                            pg:16,  meetingId:'m1',  done:false },
+    { id:'c2',  num:2,  name:'Impedidos de entrar em Canaã',                                  pg:20,  meetingId:'m1',  done:false },
+    { id:'c3',  num:3,  name:'A síndrome da Playboy',                                         pg:26,  meetingId:'m2',  done:false },
+    { id:'c4',  num:4,  name:'Dez ordens ou simples sugestões?',                              pg:32,  meetingId:'m3',  done:false },
+    { id:'c5',  num:5,  name:'Que rombo foi aquele na porta?',                                pg:42,  meetingId:'m4',  done:false },
+    { id:'c6',  num:6,  name:'Afetuoso, mas enérgico também',                                 pg:48,  meetingId:'m4',  done:false },
+    { id:'c7',  num:7,  name:'Há um sacerdote na casa?',                                      pg:57,  meetingId:'m5',  done:false },
+    { id:'c8',  num:8,  name:'Gorjeta — Um gesto de apreciação',                              pg:64,  meetingId:'m5',  done:false },
+    { id:'c9',  num:9,  name:'Trocando de cabeça',                                            pg:71,  meetingId:'m6',  done:false },
+    { id:'c10', num:10, name:'"As transferências de culpa terminam aqui!"',                   pg:79,  meetingId:'m7',  done:false },
+    { id:'c11', num:11, name:'Uma caricatura de pai',                                         pg:88,  meetingId:'m8',  done:false },
+    { id:'c12', num:12, name:'Pais ausentes',                                                 pg:95,  meetingId:'m9',  done:false },
+    { id:'c13', num:13, name:'Pare, olhe, escute!',                                           pg:100, meetingId:'m9',  done:false },
+    { id:'c14', num:14, name:'Um casamento experimenta uma renovação',                        pg:105, meetingId:'m10', done:false },
+    { id:'c15', num:15, name:'Uma questão decisiva',                                          pg:111, meetingId:'m10', done:false },
+    { id:'c16', num:16, name:'Homens imaturos',                                               pg:115, meetingId:'m11', done:false },
+    { id:'c17', num:17, name:'O que importa é o coração',                                     pg:120, meetingId:'m11', done:false },
+    { id:'c18', num:18, name:'Vá até a cruz',                                                 pg:124, meetingId:'m12', done:false },
+    { id:'c19', num:19, name:'Este é o meu pai!',                                             pg:128, meetingId:'m12', done:false },
+    { id:'c20', num:20, name:'Ame a Deus com todo o fervor e não deixe a glória se dissipar', pg:134, meetingId:'m12', done:false },
+  ],
+  participants: [
+    { id:'p1',  name:'Bispo Fernando Brant',       role:'Bispo',       phone:'+55 11 99719-1540', read:false },
+    { id:'p2',  name:'Bispo Feliz',                role:'Bispo',       phone:'+55 22 998608540',  read:false },
+    { id:'p3',  name:'Pastor Cristiano',           role:'Pastor',      phone:'+55 11 96586-3396', read:false },
+    { id:'p4',  name:'Presbítero Gustavo Polleto', role:'Presbítero',  phone:'+55 11 96647-5273', read:false },
+    { id:'p5',  name:'Presbítero Henrique Lopes',  role:'Presbítero',  phone:'+55 11 99253-1787', read:false },
+    { id:'p6',  name:'Presbítero João Lourenço',   role:'Presbítero',  phone:'+55 11 98509-6612', read:false },
+    { id:'p7',  name:'Pastor Kleber Silva',        role:'Pastor',      phone:'+55 11 96992-3879', read:false },
+    { id:'p8',  name:'Presbítero Likki Santillo',  role:'Presbítero',  phone:'+55 11 98738-1616', read:false },
+    { id:'p9',  name:'Presbítero Marcos Rocha',    role:'Presbítero',  phone:'+55 11 98014-9210', read:false },
+    { id:'p10', name:'Pastor Rodrigo Padula',      role:'Pastor',      phone:'+55 11 98923-4310', read:false },
+    { id:'p11', name:'Presbítero Victor Padula',   role:'Presbítero',  phone:'+55 11 98923-4641', read:false },
+    { id:'p12', name:'Vitor Hugo',                 role:'Membro',      phone:'+351 939532181',    read:false },
+    { id:'p13', name:'Pastor Lucas Rocha',         role:'Pastor',      phone:'+55 13 99781-8633', read:false },
+    { id:'p14', name:'Presbítero Lucas More',      role:'Presbítero',  phone:'+55 11 93017-0393', read:false },
+    { id:'p15', name:'Pastor Bruno Santos',        role:'Pastor',      phone:'+55 13 98214-3019', read:false },
+  ],
+  alerts: [],
+  atas: []
+};
+
+// ── GOOGLE SHEETS SYNC ───────────────────────────────────────────
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzzJasAbDRZ--KjiPrEp4viVLpLUdJTxF6gmH_8alcWjdmMYHY04L31YbvfXv6kJypr_A/exec';
+const STORAGE_KEY = 'cedrus-cache-v1'; // cache local para uso offline
+
+let S = JSON.parse(JSON.stringify(DEFAULT));
+let saveTimer = null;
+let isSyncing = false;
+
+// Converte array de objetos → rows para o Sheets e vice-versa
+function toRows(arr) { return arr; }
+
+// Carrega dados do Google Sheets. Fallback para localStorage se offline.
+async function loadState() {
+  setSyncStatus('saving');
+  document.getElementById('sync-label').textContent = 'Carregando...';
+  try {
+    const keys = ['meetings','chapters','participants','alerts','atas','books','meta'];
+    const results = await Promise.all(keys.map(k =>
+      fetch(GAS_URL + '?sheet=' + k)
+        .then(r => r.json())
+        .catch(() => null)
+    ));
+    const [meetings, chapters, participants, alerts, atas, books, meta] = results;
+
+    if (meetings && meetings.length > 0) {
+      // Carrega cada aba — se vazia, usa DEFAULT e agenda regravação
+      S.meetings = meetings.map(deserializeMeeting);
+      S.chapters = chapters && chapters.length > 0
+        ? chapters.map(deserializeChapter) : DEFAULT.chapters;
+      S.alerts   = alerts && alerts.length > 0
+        ? alerts.map(deserializeAlert) : [];
+      S.atas     = atas && atas.length > 0
+        ? atas.map(deserializeAta) : [];
+      S.books    = books && books.length > 0
+        ? books : DEFAULT.books;
+      if (meta && meta.length > 0) S.activeBookId = meta[0].activeBookId || DEFAULT.activeBookId;
+
+      // Participantes: se aba vazia, usa DEFAULT e regrava imediatamente
+      if (participants && participants.length > 0) {
+        S.participants = participants.map(deserializeParticipant);
+      } else {
+        S.participants = JSON.parse(JSON.stringify(DEFAULT.participants));
+        await saveSheet('participants', S.participants.map(serializeParticipant));
+        showToast('Participantes restaurados no Sheets!');
+      }
+
+      // Garante mensagem do 1º encontro
+      const m1 = S.meetings.find(m => m.id === 'm1');
+      if (m1 && !m1.customMsg) m1.customMsg = MSG_M1;
+
+      // Salva cache local
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(S));
+    } else {
+      // Sheets completamente vazio — popula tudo com DEFAULT
+      S = JSON.parse(JSON.stringify(DEFAULT));
+      await saveAllToSheets();
+      showToast('Dados iniciais gravados no Sheets!');
+    }
+  } catch(e) {
+    // Offline — tenta cache local
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) S = JSON.parse(raw);
+    } catch(e2) {}
+    setSyncStatus('error');
+    showToast('Modo offline — dados locais');
+  }
+  document.getElementById('loading').style.display = 'none';
+  renderAll();
+  setInterval(checkDueAlerts, 60000);
+  setSyncStatus('ok');
+}
+
+// Serialização — converte objetos complexos para strings simples (Sheets não aceita objetos)
+const NL_ENCODE = '[[NL]]';
+function serializeMeeting(m) {
+  return { id: m.id, date: m.date, chapters: m.chapters, done: m.done?'1':'0',
+           link: m.link||'', notes: m.notes||'',
+           customMsg: (m.customMsg||'').split('\n').join(NL_ENCODE) };
+}
+function deserializeMeeting(m) {
+  return { ...m, done: m.done==='1'||m.done===true,
+           customMsg: (m.customMsg||'').split(NL_ENCODE).join('\n') };
+}
+function serializeParticipant(p) {
+  // Prefix phone with apostrophe to prevent Google Sheets treating + numbers as formulas
+  const phone = p.phone || '';
+  const safePhone = phone.startsWith('+') ? "'" + phone : phone;
+  return { id: p.id, name: p.name, role: p.role, phone: safePhone, read: p.read?'1':'0' };
+}
+function deserializeParticipant(p) {
+  // Strip the leading apostrophe if present when reading back
+  const phone = (p.phone || '').startsWith("'") ? p.phone.slice(1) : p.phone || '';
+  return { ...p, phone, read: p.read==='1'||p.read===true };
+}
+
+function serializeChapter(c) {
+  return { id: c.id, num: c.num, name: c.name, pg: c.pg||'', meetingId: c.meetingId||'', done: c.done?'1':'0' };
+}
+function deserializeChapter(c) {
+  return { ...c, num: parseInt(c.num)||c.num, pg: parseInt(c.pg)||c.pg, done: c.done==='1'||c.done===true };
+}
+function serializeAlert(a) {
+  return { id: a.id, meetingId: a.meetingId, alertDate: a.alertDate, days: a.days,
+           incLink: a.incLink?'1':'0', sent: a.sent?'1':'0' };
+}
+function deserializeAlert(a) {
+  return { ...a, days: parseInt(a.days)||a.days, incLink: a.incLink==='1'||a.incLink===true, sent: a.sent==='1'||a.sent===true };
+}
+function serializeAta(a) {
+  return { meetingId: a.meetingId, notes: (a.notes||'').split('\n').join(NL_ENCODE), ts: a.ts||Date.now() };
+}
+function deserializeAta(a) {
+  return { ...a, notes: (a.notes||'').split(NL_ENCODE).join('\n') };
+}
+
+// Salva UMA aba específica no Sheets
+async function saveSheet(sheetName, data) {
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({ sheet: sheetName, data }),
+      headers: { 'Content-Type': 'text/plain' }
+    });
+  } catch(e) { /* silent */ }
+}
+
+// Salva TUDO no Sheets (primeira carga)
+async function saveAllToSheets() {
+  await Promise.all([
+    saveSheet('meetings',     S.meetings.map(serializeMeeting)),
+    saveSheet('chapters',     S.chapters.map(serializeChapter)),
+    saveSheet('participants', S.participants.map(serializeParticipant)),
+    saveSheet('alerts',       S.alerts.map(serializeAlert)),
+    saveSheet('atas',         S.atas.map(serializeAta)),
+    saveSheet('books',        S.books),
+    saveSheet('meta',         [{ activeBookId: S.activeBookId }]),
+  ]);
+}
+
+// Decide qual aba salvar baseado no que mudou
+function queueSave(changed) {
+  setSyncStatus('saving');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    // Sempre salva cache local
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(S));
+    // Salva aba específica no Sheets
+    try {
+      const saves = [];
+      if (!changed || changed === 'meetings')     saves.push(saveSheet('meetings',     S.meetings.map(serializeMeeting)));
+      if (!changed || changed === 'chapters')     saves.push(saveSheet('chapters',     S.chapters.map(serializeChapter)));
+      if (!changed || changed === 'participants') saves.push(saveSheet('participants', S.participants.map(serializeParticipant)));
+      if (!changed || changed === 'alerts')       saves.push(saveSheet('alerts',       S.alerts.map(serializeAlert)));
+      if (!changed || changed === 'atas')         saves.push(saveSheet('atas',         S.atas.map(serializeAta)));
+      if (!changed || changed === 'books')        saves.push(saveSheet('books',        S.books));
+      if (!changed || changed === 'meta')         saves.push(saveSheet('meta',         [{ activeBookId: S.activeBookId }]));
+      await Promise.all(saves);
+      setSyncStatus('ok');
+    } catch(e) { setSyncStatus('error'); }
+  }, 800);
+}
+
+function setSyncStatus(s) {
+  document.getElementById('sync-dot').className = 'sync-dot' + (s==='saving'?' saving':s==='error'?' error':'');
+  document.getElementById('sync-label').textContent = s==='saving'?'Salvando...':s==='error'?'Erro — offline':'Sincronizado ✓';
+}
+
+async function forceResync() {
+  setSyncStatus('saving');
+  document.getElementById('sync-label').textContent = 'Regravando tudo...';
+  try {
+    await saveAllToSheets();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(S));
+    setSyncStatus('ok');
+    showToast('Todos os dados regravados no Sheets!');
+  } catch(e) {
+    setSyncStatus('error');
+    showToast('Erro ao regravar — verifique a conexão');
+  }
+}
+
+function renderAll() {
+  renderAgenda(); renderParticipants(); renderBook(); renderChapters();
+  renderAlerts(); renderAtas(); renderLibrary();
+  updateStats(); populateSelects(); checkDueAlerts();
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────
+function sm() { return [...S.meetings].sort((a,b)=>a.date.localeCompare(b.date)); }
+function fmtL(d) { if(!d)return''; const dt=new Date(d+'T12:00:00'); return `${dt.getDate()} de ${MONTHS_L[dt.getMonth()]}`; }
+function fmtS(d) { if(!d)return''; const dt=new Date(d+'T12:00:00'); return `${dt.getDate()}/${dt.getMonth()+1}`; }
+function ord(i) { return ORDINALS[i] || (i+1)+'º'; }
+function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
+function switchTab(tab,btn) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+function updateStats() {
+  document.getElementById('s-total').textContent = S.meetings.length;
+  document.getElementById('s-done').textContent  = S.meetings.filter(m=>m.done).length;
+  document.getElementById('s-members').textContent = S.participants.length;
+}
+
+// ── AGENDA ───────────────────────────────────────────────────────
+function renderAgenda() {
+  const sorted = sm(), next = sorted.find(m=>!m.done);
+  if (next) {
+    const idx = sorted.indexOf(next);
+    const d = new Date(next.date+'T20:00:00-03:00'), diff = d - new Date();
+    const days = Math.max(0, Math.floor(diff/86400000));
+    document.getElementById('next-title').textContent = `${ord(idx)} Encontro — ${next.chapters}`;
+    document.getElementById('next-meta').textContent  = `Terça-feira, ${fmtL(next.date)} · 20h–21h`;
+    document.getElementById('countdown').textContent  = diff<=0 ? 'Hoje!' : `Faltam ${days} dia${days!==1?'s':''}`;
+  }
+  const list = document.getElementById('meeting-list');
+  if (!sorted.length) { list.innerHTML='<div class="section-empty">Nenhum encontro agendado.</div>'; return; }
+  list.innerHTML = sorted.map((m,i) => {
+    const d = new Date(m.date+'T12:00:00');
+    const isNext = m===next;
+    const badge = m.done ? '<span class="badge bk">Realizado</span>' : isNext ? '<span class="badge bp">Próximo</span>' : '<span class="badge bb">Agendado</span>';
+    const lnk = m.link ? ` · <a href="${m.link}" style="color:#534AB7;font-size:11px" target="_blank">Zoom ↗</a>` : '';
+    const chaps = S.chapters.filter(c=>c.meetingId===m.id).sort((a,b)=>a.num-b.num);
+    const detail = chaps.map(c=>`${c.num}. ${c.name} <span style="color:var(--text3)">(p.${c.pg})</span>`).join('<br>');
+    const msgBadge = m.customMsg ? '<span class="badge bg" style="font-size:10px">✉ lembrete</span>' : '';
+    return `<div class="meeting-item">
+      <div class="date-box"><div class="date-day">${d.getDate()}</div><div class="date-month">${MONTHS[d.getMonth()]}</div></div>
+      <div class="meeting-info">
+        <div class="meeting-title-row">${ord(i)} Encontro ${badge} ${msgBadge}</div>
+        <div class="meeting-meta">Terça · 20h–21h${lnk}</div>
+        <span class="meeting-chaps">📖 ${m.chapters}</span>
+        ${detail?`<div class="meeting-detail">${detail}</div>`:''}
+        ${m.notes?`<div style="font-size:11px;color:var(--text2);margin-top:4px;font-style:italic">${m.notes}</div>`:''}
+        <div class="inline-edit" id="ie-${m.id}">
+          <div class="ie-row"><label>Data</label><input type="date" id="ied-${m.id}" value="${m.date}"></div>
+          <div class="ie-row"><label>Capítulos</label><input type="text" id="iec-${m.id}" value="${m.chapters}"></div>
+          <div class="ie-row"><label>Link Zoom</label><input type="text" id="iel-${m.id}" value="${m.link||''}"></div>
+          <div class="ie-row"><label>Notas</label><input type="text" id="ien-${m.id}" value="${m.notes||''}"></div>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button class="btn btn-p btn-sm" onclick="saveMeetingEdit('${m.id}')">Salvar</button>
+            <button class="btn btn-sm" onclick="closeEdit('${m.id}')">Cancelar</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">
+        <button class="icon-btn" onclick="toggleEdit('${m.id}')" title="Editar">✏️</button>
+        ${!m.done?`<button class="icon-btn" onclick="markDone('${m.id}')" style="color:var(--green-mid)" title="Marcar realizado">✓</button>`:''}
+        <button class="icon-btn danger" onclick="deleteMeeting('${m.id}')" title="Remover">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleEdit(id) { document.getElementById('ie-'+id).classList.toggle('open'); }
+function closeEdit(id)   { document.getElementById('ie-'+id).classList.remove('open'); }
+function saveMeetingEdit(id) {
+  const m = S.meetings.find(m=>m.id===id); if(!m) return;
+  m.date     = document.getElementById('ied-'+id).value || m.date;
+  m.chapters = document.getElementById('iec-'+id).value || m.chapters;
+  m.link     = document.getElementById('iel-'+id).value;
+  m.notes    = document.getElementById('ien-'+id).value;
+  queueSave('meetings'); renderAll(); showToast('Encontro atualizado!');
+}
+function addMeeting() {
+  const date=document.getElementById('nm-date').value, chaps=document.getElementById('nm-chaps').value.trim();
+  if(!date||!chaps){showToast('Preencha data e capítulos');return;}
+  S.meetings.push({id:'m'+Date.now(),date,chapters:chaps,done:false,
+    link:document.getElementById('nm-link').value.trim(),
+    notes:document.getElementById('nm-notes').value.trim(),customMsg:''});
+  ['nm-date','nm-chaps','nm-link','nm-notes'].forEach(id=>document.getElementById(id).value='');
+  queueSave('meetings'); renderAll(); showToast('Encontro adicionado!');
+}
+function deleteMeeting(id) { S.meetings=S.meetings.filter(m=>m.id!==id); queueSave('meetings'); renderAll(); showToast('Encontro removido'); }
+function markDone(id) { const m=S.meetings.find(m=>m.id===id); if(m){m.done=true;queueSave('meetings');renderAll();showToast('Marcado como realizado');} }
+
+// ── PARTICIPANTS ──────────────────────────────────────────────────
+function renderParticipants() {
+  document.getElementById('p-count').textContent = S.participants.length+' membros';
+  const list = document.getElementById('participant-list');
+  if(!S.participants.length){list.innerHTML='<div class="section-empty">Nenhum participante registrado.</div>';return;}
+  list.innerHTML = S.participants.map(p => {
+    const ini = p.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const waNum = p.phone ? p.phone.split('').filter(c=>c>='0'&&c<='9').join('') : '';
+    const waLink = waNum ? `<a href="https://wa.me/${waNum}" target="_blank" title="WhatsApp" style="text-decoration:none;font-size:18px;line-height:1;margin-right:4px">📱</a>` : '';
+    return `<div class="participant-item">
+      <div class="avatar">${ini}</div>
+      <div style="flex:1">
+        <div class="p-name">${p.name}</div>
+        <div class="p-role">${p.role}${p.phone ? ' · <span style=\"font-size:10px;color:var(--text3)\">' + p.phone + '</span>' : ''}</div>
+      </div>
+      ${waLink}
+      <div class="read-toggle ${p.read?'read-yes':'read-no'}" onclick="toggleRead('${p.id}')" title="${p.read?'Leu os capítulos':'Leitura pendente'}">${p.read?'✓':'?'}</div>
+      <button class="icon-btn danger" onclick="deleteParticipant('${p.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+function addParticipant() {
+  const name = document.getElementById('np-name').value.trim();
+  if(!name){showToast('Digite o nome');return;}
+  S.participants.push({id:'p'+Date.now(),name,role:document.getElementById('np-role').value,phone:document.getElementById('np-phone').value.trim(),read:false});
+  document.getElementById('np-name').value=''; document.getElementById('np-phone').value='';
+  queueSave('participants'); renderParticipants(); updateStats(); showToast('Participante adicionado!');
+}
+function deleteParticipant(id) { S.participants=S.participants.filter(p=>p.id!==id); queueSave('participants'); renderParticipants(); updateStats(); }
+function toggleRead(id) { const p=S.participants.find(p=>p.id===id); if(p){p.read=!p.read;queueSave('participants');renderParticipants();} }
+
+// ── BOOK ─────────────────────────────────────────────────────────
+function aBook() { return S.books.find(b=>b.id===S.activeBookId)||S.books[0]; }
+function renderBook() {
+  const b = aBook(); if(!b) return;
+  const pct = b.totalChapters>0 ? Math.round((b.chaptersRead/b.totalChapters)*100) : 0;
+  document.getElementById('spine-text').textContent       = b.title.toUpperCase();
+  document.getElementById('book-title-disp').textContent  = b.title;
+  document.getElementById('book-author-disp').textContent = b.author;
+  document.getElementById('book-pbar').style.cssText = `width:${pct}%;background:${b.color}`;
+  document.getElementById('book-spine-el').style.background = b.color;
+  document.getElementById('book-prog-label').textContent = `${b.chaptersRead} de ${b.totalChapters} capítulos lidos (${pct}%)`;
+}
+
+// ── CHAPTERS ─────────────────────────────────────────────────────
+function renderChapters() {
+  const sorted = sm();
+  const list   = document.getElementById('chapter-list');
+  if(!S.chapters.length){list.innerHTML='<div class="section-empty">Nenhum capítulo registrado.</div>';return;}
+  const mSel = sorted.map((m,i)=>`<option value="${m.id}">${ord(i)} · ${fmtS(m.date)}</option>`).join('');
+  let html = '';
+  sorted.forEach((m,mi) => {
+    const chaps = S.chapters.filter(c=>c.meetingId===m.id).sort((a,b)=>a.num-b.num);
+    if(!chaps.length) return;
+    const done=chaps.filter(c=>c.done).length, allDone=done===chaps.length;
+    html += `<div class="chapter-group">
+      <div class="chapter-group-header">
+        <span>${ord(mi)} Encontro · ${fmtL(m.date)}</span>
+        <span class="badge ${allDone?'bg':'bk'}">${allDone?'Completo':`${done}/${chaps.length} lidos`}</span>
+      </div>`;
+    chaps.forEach(c => {
+      html += `<div class="chapter-item ${c.done?'done-item':''}" id="ch-${c.id}">
+        <div class="ch-num ${c.done?'done-num':''}" onclick="toggleChapter('${c.id}')">${c.num}</div>
+        <span class="ch-name${c.done?' done-text':''}" onclick="startEditCh('${c.id}')">${c.name}</span>
+        <input class="ch-edit-in" id="chin-${c.id}" value="${c.name}"
+          onblur="saveCh('${c.id}')" onkeydown="if(event.key==='Enter')saveCh('${c.id}')">
+        <select class="ch-meeting-sel" id="cms-${c.id}" onchange="saveChMtg('${c.id}')">${mSel}</select>
+        <span class="ch-pg">p.${c.pg||'—'}</span>
+        <span class="badge ${c.done?'bg':'bk'}" style="cursor:pointer;flex-shrink:0" onclick="toggleChapter('${c.id}')">${c.done?'Lido':'—'}</span>
+        <button class="icon-btn danger" onclick="deleteCh('${c.id}')">✕</button>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  const unassigned = S.chapters.filter(c=>!sorted.find(m=>m.id===c.meetingId));
+  if(unassigned.length) {
+    html += `<div class="chapter-group"><div class="chapter-group-header"><span>Sem encontro atribuído</span></div>`;
+    unassigned.sort((a,b)=>a.num-b.num).forEach(c => {
+      html += `<div class="chapter-item" id="ch-${c.id}">
+        <div class="ch-num" onclick="toggleChapter('${c.id}')">${c.num}</div>
+        <span class="ch-name" onclick="startEditCh('${c.id}')">${c.name}</span>
+        <input class="ch-edit-in" id="chin-${c.id}" value="${c.name}"
+          onblur="saveCh('${c.id}')" onkeydown="if(event.key==='Enter')saveCh('${c.id}')">
+        <select class="ch-meeting-sel" id="cms-${c.id}" onchange="saveChMtg('${c.id}')">${mSel}</select>
+        <span class="ch-pg">p.${c.pg||'—'}</span>
+        <span class="badge ${c.done?'bg':'bk'}" style="cursor:pointer" onclick="toggleChapter('${c.id}')">${c.done?'Lido':'—'}</span>
+        <button class="icon-btn danger" onclick="deleteCh('${c.id}')">✕</button>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  list.innerHTML = html;
+  S.chapters.forEach(c => { const s=document.getElementById('cms-'+c.id); if(s)s.value=c.meetingId||''; });
+}
+function startEditCh(id) {
+  const row = document.getElementById('ch-'+id);
+  row.querySelector('.ch-name').style.display='none';
+  const inp = document.getElementById('chin-'+id); inp.style.display='block'; inp.focus(); inp.select();
+  document.getElementById('cms-'+id).style.display='block';
+}
+function saveCh(id) {
+  const c=S.chapters.find(c=>c.id===id); if(!c) return;
+  const v=document.getElementById('chin-'+id).value.trim(); if(v) c.name=v;
+  queueSave('chapters'); renderChapters();
+}
+function saveChMtg(id) { const c=S.chapters.find(c=>c.id===id); if(!c)return; c.meetingId=document.getElementById('cms-'+id).value; queueSave('chapters'); }
+function toggleChapter(id) {
+  const c=S.chapters.find(c=>c.id===id); if(!c) return;
+  c.done=!c.done;
+  const b=aBook(); if(b) b.chaptersRead=S.chapters.filter(ch=>ch.done).length;
+  queueSave('chapters'); renderBook(); renderChapters();
+}
+function deleteCh(id) { S.chapters=S.chapters.filter(c=>c.id!==id); queueSave('chapters'); renderChapters(); showToast('Capítulo removido'); }
+function addChapter() {
+  const name=document.getElementById('new-ch-name').value.trim();
+  if(!name){showToast('Digite o nome do capítulo');return;}
+  const num=S.chapters.length>0?Math.max(...S.chapters.map(c=>c.num))+1:1;
+  S.chapters.push({id:'c'+Date.now(),num,name,pg:null,meetingId:sm()[0]?.id||'',done:false});
+  document.getElementById('new-ch-name').value='';
+  queueSave('chapters'); renderChapters(); showToast('Capítulo adicionado!');
+}
+
+// ── REMINDERS ────────────────────────────────────────────────────
+function populateSelects() {
+  const sorted = sm();
+  const opts = sorted.map((m,i)=>`<option value="${m.id}">${ord(i)} Encontro · ${fmtS(m.date)}</option>`).join('');
+  ['reminder-meeting-sel','alert-meeting-sel','ata-sel'].forEach(id => {
+    const el=document.getElementById(id); if(el) el.innerHTML=opts;
+  });
+  updateReminderPreview();
+}
+function getSelMeeting() {
+  const selId=document.getElementById('reminder-meeting-sel')?.value;
+  return S.meetings.find(m=>m.id===selId) || sm().find(m=>!m.done) || sm()[0];
+}
+function buildAutoMsg(m) {
+  const sorted=sm(), idx=sorted.indexOf(m), b=aBook();
+  const chaps=S.chapters.filter(c=>c.meetingId===m.id).sort((a,b)=>a.num-b.num);
+  const chapsList=chaps.length?chaps.map(c=>`• Cap. ${c.num}: ${c.name} (p.${c.pg})`).join('\n'):m.chapters;
+  const lnk=m.link?`\n🔗 Link Zoom: ${m.link}`:'';
+  return `🌲 *CEDRUS — Clube do Livro*
+
+Valentes, nosso ${ord(idx)} encontro está chegando!
+
+📅 *Terça-feira, ${fmtL(m.date)}*
+🕗 *20h às 21h*${lnk}
+
+📖 *Leitura desta semana${b?` — ${b.title}`:''}:*
+${chapsList}${m.notes?`\n\n💬 ${m.notes}`:''}
+
+Venham com o livro lido e prontos para o mastermind!
+
+_Cedrus — Forjando homens para Deus_`;
+}
+function updateReminderPreview() {
+  const m=getSelMeeting(); if(!m){document.getElementById('reminder-msg').textContent='Nenhum encontro próximo.';return;}
+  const text=m.customMsg||buildAutoMsg(m);
+  document.getElementById('reminder-msg').textContent=text;
+  const badge=document.getElementById('reminder-badge');
+  badge.textContent=m.customMsg?'Mensagem personalizada':'Mensagem automática';
+  badge.className='badge '+(m.customMsg?'bp':'bg');
+  document.getElementById('msg-custom-text').value=text;
+}
+function switchMsgTab(tab,btn) {
+  document.querySelectorAll('.msg-tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('msg-preview-panel').style.display=tab==='preview'?'block':'none';
+  document.getElementById('msg-edit-panel').style.display=tab==='edit'?'block':'none';
+  if(tab==='edit') {
+    const m=getSelMeeting();
+    document.getElementById('msg-custom-text').value=m?.customMsg||buildAutoMsg(m);
+  }
+}
+function saveCustomMsg() {
+  const m=getSelMeeting(); if(!m) return;
+  m.customMsg=document.getElementById('msg-custom-text').value.trim();
+  queueSave('meetings'); updateReminderPreview(); renderAgenda(); showToast('Mensagem salva!');
+}
+function resetCustomMsg() {
+  const m=getSelMeeting(); if(!m) return;
+  m.customMsg='';
+  document.getElementById('msg-custom-text').value=buildAutoMsg(m);
+  queueSave('meetings'); updateReminderPreview(); renderAgenda(); showToast('Mensagem restaurada ao padrão automático');
+}
+function copyReminder() { navigator.clipboard.writeText(document.getElementById('reminder-msg').textContent).then(()=>showToast('Copiado!')); }
+function openWhatsApp() { window.open('https://wa.me/?text='+encodeURIComponent(document.getElementById('reminder-msg').textContent),'_blank'); }
+
+// ── ALERTS ───────────────────────────────────────────────────────
+function scheduleAlert() {
+  const mid=document.getElementById('alert-meeting-sel').value;
+  const days=parseInt(document.getElementById('alert-days').value);
+  const incLink=document.getElementById('alert-link').value==='sim';
+  const m=S.meetings.find(m=>m.id===mid); if(!m){showToast('Selecione um encontro');return;}
+  const ad=new Date(m.date+'T20:00:00-03:00'); ad.setDate(ad.getDate()-days);
+  const ex=S.alerts.findIndex(a=>a.meetingId===mid);
+  const obj={id:'a'+Date.now(),meetingId:mid,alertDate:ad.toISOString(),days,incLink,sent:false};
+  if(ex>=0) S.alerts[ex]=obj; else S.alerts.push(obj);
+  queueSave('alerts'); renderAlerts(); showToast(`Alerta agendado — ${days} dia${days!==1?'s':''} antes!`);
+}
+function renderAlerts() {
+  const list=document.getElementById('alerts-list');
+  document.getElementById('alerts-count').textContent=S.alerts.length;
+  if(!S.alerts.length){list.innerHTML='<div class="section-empty">Nenhum alerta agendado.</div>';return;}
+  const sorted=sm();
+  list.innerHTML=S.alerts.map(a=>{
+    const m=S.meetings.find(m=>m.id===a.meetingId);
+    const mi=sorted.findIndex(m=>m.id===a.meetingId);
+    const ad=new Date(a.alertDate);
+    const isDue=!a.sent&&ad<=new Date();
+    const badge=a.sent?'<span class="badge bg">Enviado</span>':isDue?'<span class="badge ba">Enviar agora</span>':'<span class="badge bb">Agendado</span>';
+    const icon=a.sent?'✅':isDue?'🔔':'⏰';
+    return `<div class="alert-item">
+      <div class="alert-icon ${a.sent?'sent':isDue?'active':'pending'}">${icon}</div>
+      <div class="alert-info">
+        <div class="alert-title">${ord(mi)} Encontro — ${m?.chapters||''} ${badge}</div>
+        <div class="alert-meta">Alerta: ${fmtS(ad.toISOString().split('T')[0])} · ${a.days} dia${a.days!==1?'s':''} antes${a.incLink?' · com link':''}</div>
+      </div>
+      ${isDue?`<button class="btn btn-p btn-sm" onclick="markAlertSent('${a.id}')">Enviado ✓</button>`:''}
+      <button class="icon-btn danger" onclick="deleteAlert('${a.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+function markAlertSent(id) { const a=S.alerts.find(a=>a.id===id); if(a){a.sent=true;queueSave('alerts');renderAlerts();checkDueAlerts();showToast('Alerta marcado como enviado');} }
+function deleteAlert(id)   { S.alerts=S.alerts.filter(a=>a.id!==id); queueSave('alerts'); renderAlerts(); }
+function checkDueAlerts() {
+  const due=S.alerts.find(a=>!a.sent&&new Date(a.alertDate)<=new Date());
+  const banner=document.getElementById('alert-due-banner');
+  if(due){
+    const sorted=sm(), mi=sorted.findIndex(m=>m.id===due.meetingId);
+    const m=S.meetings.find(m=>m.id===due.meetingId);
+    document.getElementById('alert-banner-text').textContent=`🔔 Lembrete do ${ord(mi)} Encontro (${m?.chapters||''}) aguardando envio!`;
+    banner.style.display='block';
+  } else { banner.style.display='none'; }
+}
+function sendDueAlert() {
+  openWhatsApp();
+  const due=S.alerts.find(a=>!a.sent&&new Date(a.alertDate)<=new Date());
+  if(due){due.sent=true;queueSave('alerts');renderAlerts();checkDueAlerts();}
+}
+
+// ── ATAS ─────────────────────────────────────────────────────────
+function saveAta() {
+  const mid=document.getElementById('ata-sel').value;
+  const notes=document.getElementById('ata-notes').value.trim();
+  if(!notes){showToast('Escreva as notas da reunião');return;}
+  if(!S.atas) S.atas=[];
+  const ex=S.atas.findIndex(a=>a.meetingId===mid);
+  const obj={meetingId:mid,notes,ts:Date.now()};
+  if(ex>=0) S.atas[ex]=obj; else S.atas.push(obj);
+  document.getElementById('ata-notes').value='';
+  queueSave('atas'); renderAtas(); showToast('Ata salva!');
+}
+function renderAtas() {
+  const div=document.getElementById('atas-display');
+  if(!S.atas||!S.atas.length){div.innerHTML='';return;}
+  const sorted=sm();
+  div.innerHTML='<div class="card"><div class="card-header"><span class="card-title">Atas salvas</span></div>'+
+    S.atas.slice().reverse().map(a=>{
+      const mi=sorted.findIndex(m=>m.id===a.meetingId);
+      const m=S.meetings.find(m=>m.id===a.meetingId);
+      return `<div style="padding:10px 0;border-bottom:0.5px solid var(--border)">
+        <div style="font-size:12px;font-weight:600;margin-bottom:5px;color:var(--purple)">${ord(mi)} Encontro${m?` · ${fmtS(m.date)}`:''}</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">${a.notes.split('\n').join('<br>')}</div>
+      </div>`;
+    }).join('')+'</div>';
+}
+
+// ── LIBRARY ──────────────────────────────────────────────────────
+function renderLibrary() {
+  const list=document.getElementById('book-lib-list');
+  document.getElementById('lib-count').textContent=S.books.length+' livros';
+  if(!S.books.length){list.innerHTML='<div class="section-empty">Nenhum livro na biblioteca.</div>';return;}
+  list.innerHTML=S.books.map(b=>`
+    <div class="book-lib-item ${b.id===S.activeBookId?'active-book':''}" onclick="setActiveBook('${b.id}')">
+      <div class="book-mini-spine" style="background:${b.color}"></div>
+      <div class="book-lib-info">
+        <div class="book-lib-title">${b.title} ${b.id===S.activeBookId?'<span class="badge bp">Ativo</span>':''}</div>
+        <div class="book-lib-author">${b.author} · ${b.totalChapters} capítulos</div>
+      </div>
+      ${b.id!==S.activeBookId?`<button class="btn btn-sm" onclick="event.stopPropagation();setActiveBook('${b.id}')">Ativar</button>`:''}
+      ${S.books.length>1?`<button class="icon-btn danger" onclick="event.stopPropagation();deleteBook('${b.id}')">✕</button>`:''}
+    </div>`).join('');
+}
+function addBook() {
+  const title=document.getElementById('nb-title').value.trim(), author=document.getElementById('nb-author').value.trim();
+  if(!title||!author){showToast('Preencha título e autor');return;}
+  S.books.push({id:'b'+Date.now(),title,author,totalChapters:parseInt(document.getElementById('nb-chapters').value)||12,chaptersRead:0,color:document.getElementById('nb-color').value});
+  ['nb-title','nb-author'].forEach(id=>document.getElementById(id).value='');
+  queueSave('books'); renderLibrary(); showToast('Livro adicionado!');
+}
+function setActiveBook(id) { S.activeBookId=id; queueSave('meta'); renderBook(); renderLibrary(); showToast('Livro ativo atualizado!'); }
+function deleteBook(id) {
+  if(S.books.length<=1){showToast('Mantenha ao menos um livro');return;}
+  S.books=S.books.filter(b=>b.id!==id);
+  if(S.activeBookId===id) S.activeBookId=S.books[0].id;
+  queueSave('books'); renderLibrary(); renderBook();
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', loadState);
+</script>
+</body>
+</html>
